@@ -25,6 +25,13 @@ Los almacenes de credenciales *esperados* (`.aws/credentials`, `.ssh/id_rsa`,
 escanean por contenido — solo se avisa si tienen permisos de fichero
 demasiado abiertos.
 
+Los certificados **públicos y conocidos** (ej. los `.ovpn` de demostración
+del servicio gratuito VPNBook, `vpnbook-*.ovpn`) se descartan por completo
+— el mismo fichero, con el mismo contenido, lo tiene cualquiera. Esto es
+un allowlist por *nombre exacto de fichero*, no por extensión: un `.ovpn`
+con una clave privada real de tu propio Tailscale/OpenVPN/Wazuh se sigue
+detectando con normalidad.
+
 ## Instalación
 
 Solo requiere Python 3.9+ y la librería estándar. Todo lo demás es opcional:
