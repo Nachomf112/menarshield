@@ -76,7 +76,7 @@ MARCA = "Menarguez-IA Solutions"
 PRODUCTO = "MenarShield"
 URL_MARCA = "https://ai.menarguez-ia.com/"
 LOGO_PATH_DEFAULT = Path(__file__).parent / "logo-menarguez-ia.png"
-VERSION = "1.4.0"
+VERSION = "1.4.1"
 VERSION_FECHA = "2026-09-22"
 
 BANNER_ASCII = r"""
@@ -110,6 +110,16 @@ ALMACENES_CREDENCIALES_ESPERADOS = (
     ".kube/config",
     ".config/gh/hosts.yml",
     ".ssh/id_rsa", ".ssh/id_ed25519", ".ssh/id_ecdsa",
+)
+
+# Ficheros de credenciales PÚBLICAS y conocidas: el mismo fichero, con el
+# mismo bloque PEM, lo descarga cualquiera desde el servicio — no son un
+# secreto de nadie. Se comparan solo por el NOMBRE de fichero (fnmatch,
+# sin distinguir mayúsculas), nunca por extensión completa: un .ovpn con
+# una clave privada real de tu propio Tailscale/OpenVPN/Wazuh debe seguir
+# detectándose con normalidad, solo se descartan estos nombres exactos.
+PATRONES_CREDENCIALES_PUBLICAS = (
+    "vpnbook-*.ovpn",  # certificados de demostración del servicio gratuito VPNBook
 )
 
 # Extensiones binarias/no relevantes que no merece la pena escanear como texto
@@ -265,9 +275,19 @@ def _es_almacen_credenciales_esperado(rel: str) -> bool:
     return any(rel_posix == s or rel_posix.endswith("/" + s) for s in ALMACENES_CREDENCIALES_ESPERADOS)
 
 
+def _es_credencial_publica_conocida(nombre: str) -> bool:
+    nombre_lower = nombre.lower()
+    return any(fnmatch.fnmatch(nombre_lower, patron) for patron in PATRONES_CREDENCIALES_PUBLICAS)
+
+
 def scan_secrets(root: Path, reporte: Reporte, archivos):
     for path in archivos:
         rel = str(path.relative_to(root))
+        if _es_credencial_publica_conocida(path.name):
+            # Certificado público y conocido (ej. demo de VPNBook) — el mismo
+            # fichero, con el mismo contenido, lo tiene cualquiera. No es una
+            # fuga de nadie: se descarta sin generar ni siquiera un aviso.
+            continue
         if _es_almacen_credenciales_esperado(rel):
             try:
                 mode = path.stat().st_mode
