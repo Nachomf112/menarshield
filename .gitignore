@@ -1,0 +1,24 @@
+# Informes generados por MenarShield — nunca deben ir al repo
+menarshield-informe-*.md
+menarshield-informe-*.html
+menarshield-informe-*.pdf
+menarshield-informe-*.json
+menarshield-informe-*.sarif
+informe*.md
+informe*.html
+informe*.pdf
+informe*.json
+informe*.sarif
+
+# Reglas de ignorado locales de cada proyecto escaneado (no del propio MenarShield)
+.menarshieldignore
+
+# Python
+__pycache__/
+*.pyc
+
+# Entornos / IDEs
+.venv/
+venv/
+.vscode/
+.idea/

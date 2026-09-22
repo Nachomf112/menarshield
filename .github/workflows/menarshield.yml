@@ -1,0 +1,39 @@
+name: MenarShield security scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1" # todos los lunes a las 06:00 UTC
+
+permissions:
+  contents: read
+  security-events: write # necesario para subir el SARIF al Security tab
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias opcionales (YAML real para Docker Compose)
+        run: pip install pyyaml
+
+      - name: Escanear el repo con MenarShield
+        run: |
+          python3 menarshield.py . --formato sarif --out menarshield-informe --sin-abrir
+        continue-on-error: true # el exit code >0 con hallazgos críticos no debe tumbar el job antes de subir el SARIF
+
+      - name: Subir resultados a GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: menarshield-informe.sarif
+
+      - name: Fallar el job si hay hallazgos CRÍTICOS
+        run: |
+          python3 menarshield.py . --formato texto --sin-abrir
