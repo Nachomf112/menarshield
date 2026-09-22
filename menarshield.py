@@ -76,7 +76,7 @@ MARCA = "Menarguez-IA Solutions"
 PRODUCTO = "MenarShield"
 URL_MARCA = "https://ai.menarguez-ia.com/"
 LOGO_PATH_DEFAULT = Path(__file__).parent / "logo-menarguez-ia.png"
-VERSION = "1.4.1"
+VERSION = "1.4.2"
 VERSION_FECHA = "2026-09-22"
 
 BANNER_ASCII = r"""
@@ -1461,7 +1461,7 @@ def main():
         print(f"{PRODUCTO} v{VERSION} ({VERSION_FECHA}) — {MARCA}")
         sys.exit(0)
 
-    root_por_defecto = Path(args.ruta).resolve() if args.ruta else Path(".").resolve()
+    root_por_defecto = Path(args.ruta).expanduser().resolve() if args.ruta else Path(".").resolve()
 
     interactivo = args.formato is None and sys.stdin.isatty()
 
