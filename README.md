@@ -100,3 +100,4 @@ de GitHub vía SARIF, y falla el job si hay hallazgos críticos.
 ## Licencia
 
 Todos los derechos reservados — Menarguez-IA Solutions.
+Último escaneo verificado: 16/11/2026.
